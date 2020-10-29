@@ -10,16 +10,18 @@ class Convolver:
         self.impulse_response = impulse_response
 
     def convolve(self):
-        return numpy.convolve(signal, impulse_response)
+        return numpy.convolve(self.signal, self.impulse_response)
 
 class ConvolverMgr:
-    def __init__(self, input_filename, impulse_response_filename, output_filename):
-        self.signal_filename = signal_filename
-        self.impulse_response_filename = impulse_response_filename
+    def __init__(self, input_filename, impulse_filename, output_filename):
+        print("in: {}, impulse:{}, out:{}".format(conv_args.input, impulse_filename, output_filename))
+        self.input_filename = input_filename
+        self.impulse_filename = impulse_filename
+        self.output_filename = output_filename
 
     def _load(self):
-        signal = self.waveload(self.signal_filename)
-        impulse = w_impulse.read(self.impulse_filename)
+        signal = self.waveload(self.input_filename)
+        impulse = self.waveload(self.impulse_filename)
         self.convolver = Convolver(signal, impulse)
     
     def convolve(self):
@@ -30,7 +32,7 @@ class ConvolverMgr:
 
     @staticmethod
     def waveload(filename):
-        with wave.open("input.wav") as ifile:
+        with wave.open(filename) as ifile:
             samples = ifile.getnframes()
             audio = ifile.readframes(samples)
 
@@ -46,9 +48,9 @@ class ConvolverMgr:
 class ConvolverArgumentParser(argparse.ArgumentParser):
     def __init__(self):
         super().__init__()
-        self.add_argument("--input", required=True, nargs=1)
-        self.add_argument("--impulse", required=True, nargs=1)
-        self.add_argument("--out", required=True, nargs=1)
+        self.add_argument("--input", required=True)
+        self.add_argument("--impulse", required=True)
+        self.add_argument("--out", required=True)
         self.parse_args()
 
 
@@ -56,7 +58,6 @@ class ConvolverArgumentParser(argparse.ArgumentParser):
 if __name__ == "__main__":
     conv_parser = ConvolverArgumentParser()
     conv_args = conv_parser.parse_args()
-    print("in: {}, impulse:{}, out:{}".format(conv_args.input, conv_args.impulse, conv_args.out))
-    conv_mgr = ConvolverMgr("input.wav", "impulse.wav")
-    conv_mgr.main()
+    conv_mgr = ConvolverMgr(conv_args.input, conv_args.impulse, conv_args.out)
+    conv_mgr.convolve()
 
