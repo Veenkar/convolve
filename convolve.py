@@ -27,7 +27,7 @@ class Convolver:
 
     def _convolve(self):
         output  = np.convolve(self.signal, self.impulse_response, mode="same")
-        max_val = np.max(np.abs(output))
+        max_val = np.max(np.abs(output), axis=0)
         norm    = float(self.MAX_OUT_VAL) / max_val
         output  = np.multiply(output, norm)
         return output
@@ -43,6 +43,18 @@ class ConvolverMgr:
         self.output_filename = output_filename
         self.plot_debug=plot_debug
 
+    def convolve(self):
+        try:
+            self.tasks = asyncio.run(self._convolve_job())
+        except KeyboardInterrupt as e:
+            print("Caught keyboard interrupt. Canceling tasks...")
+
+    async def _convolve_job(self):
+        self._load()
+        self.output = self.convolver.convolve()
+        self._save()
+        print("convolution done")
+
     def _load(self):
         signal = self._waveload(self.input_filename)
         impulse = self._waveload(self.impulse_filename)
@@ -51,38 +63,6 @@ class ConvolverMgr:
     
     def _save(self):
         self._wavesave(self.output_filename, self.output, self.meta)
-
-    async def _convolve_job(self):
-        self._load()
-        self.output = self.convolver.convolve()
-        self._save()
-        print("convolution done")
-
-    def convolve(self):
-        try:
-            self.tasks = asyncio.run(self._convolve_job())
-        except KeyboardInterrupt as e:
-            print("Caught keyboard interrupt. Canceling tasks...")
-
-    def debug_plt(self, plt_data):
-        if self.plot_debug:
-            ConvolverMgr._plt(plt_data)
-
-
-
-    def _wavesave(self, filename, data, meta):
-        log.debug(f"Saving {len(data)} samples to {filename}.")
-        self.debug_plt(data)
-
-        audio_as_np_int16 = data.astype(np.int16)
-        self.debug_plt(audio_as_np_int16)
-
-        audio_buffer_int16 = audio_as_np_int16.data
-        self.debug_plt(audio_buffer_int16)
-
-        with wave.open(filename, mode='wb') as ofile:
-            ofile.setparams(meta)
-            ofile.writeframes(audio_buffer_int16)
 
     def _waveload(self, filename):
         with wave.open(filename) as ifile:
@@ -98,10 +78,28 @@ class ConvolverMgr:
         # audio_normalised = audio_as_np_float32 / self.MAX_INT_16
         return audio_as_np_float32
 
+    def _wavesave(self, filename, data, meta):
+        log.debug(f"Saving {len(data)} samples to {filename}.")
+        self._debug_plt(data)
+
+        audio_as_np_int16 = data.astype(np.int16)
+        self._debug_plt(audio_as_np_int16)
+
+        audio_buffer_int16 = audio_as_np_int16.data
+        self._debug_plt(audio_buffer_int16)
+
+        with wave.open(filename, mode='wb') as ofile:
+            ofile.setparams(meta)
+            ofile.writeframes(audio_buffer_int16)
+
     def _metaload(self, filename):
         with wave.open(filename) as ifile:
             params = ifile.getparams()
         return params
+
+    def _debug_plt(self, plt_data):
+        if self.plot_debug:
+            ConvolverMgr._plt(plt_data)
 
     def _plt(self, plt_data):
         time = range(len(plt_data))
