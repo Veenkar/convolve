@@ -7,6 +7,19 @@ import asyncio
 import matplotlib.pyplot as plt
 import logging
 
+# TODO
+# allow for using any wav file format (16,24,32 bit), use this:
+# https://stackoverflow.com/questions/34009653/convert-bytes-to-int
+# output format should be same as input
+#
+# allow correct processing of channels
+# > 2ch in, 2ch impulse -> 2ch stereo output,
+#   channel 1 convolved with channel 1, ch 2 with ch 2
+# > 2ch in, 1ch impulse -> 2ch stereo output,
+#   both channels of input convolved with impulse
+# > 1ch in, 2ch impulse -> same
+
+
 # CONFIG
 PLOT_DEBUG = False
 
@@ -71,7 +84,7 @@ class ConvolverMgr:
             log.debug(f"Loaded {samples} samples from {filename}.")
 
         # Convert buffer to float32 using NumPy                                                                                 
-        audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
+        audio_as_np_int16 = np.frombuffer(audio, dtype=np.int32)
         audio_as_np_float32 = audio_as_np_int16.astype(np.float64)
 
         # Normalise float32 array so that values are between -1.0 and +1.0                                                      
