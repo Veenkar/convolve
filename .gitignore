@@ -1,0 +1,9 @@
+# IGNORES
+
+# python cache
+**__pycache__
+
+# audio files
+**.wav
+
+
