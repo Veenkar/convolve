@@ -20,7 +20,7 @@ class Audiofile:
             log.debug(f"Loaded {samples} samples from {filename}.")
 
         # Convert buffer to float32 using NumPy                                                                                 
-        audio_as_np_int16 = np.frombuffer(audio, dtype=np.int32)
+        audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
         audio_as_np_float32 = audio_as_np_int16.astype(np.float64)
 
         # Normalise float32 array so that values are between -1.0 and +1.0                                                      
