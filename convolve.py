@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
+from convlib.audiofilewave import AudiofileWave
+from convlib.convengine import Convengine
+from convlib.convarg import Convarg
+
 import numpy as np
 import argparse
 import asyncio
-import matplotlib.pyplot as plt
 import logging
 import sys
-from convlib.audiofile import Audiofile
 
 # TODO
 # allow for using any wav file format (16,24,32 bit), use this:
@@ -22,36 +24,23 @@ from convlib.audiofile import Audiofile
 
 
 # CONFIG
-PLOT_DEBUG = False
+PLOT_DEBUG = logging.INFO
 
 # LOGGER
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARN)
 sh = logging.StreamHandler(sys.stdout)
 log.addHandler(sh)
 
-class Convolver:
-    MAX_INT_16 = (2**15)-1
-    MAX_OUTPUT_FACTOR = 0.99
-    MAX_OUT_VAL = int(MAX_OUTPUT_FACTOR * MAX_INT_16)
-    
-    def __init__(self, signal, impulse_response):
-        self.signal = signal
-        self.impulse_response = impulse_response
 
-    def _convolve(self):
-        output  = np.convolve(self.signal, self.impulse_response, mode="same")
-        max_val = np.max(np.abs(output), axis=0)
-        norm    = float(self.MAX_OUT_VAL) / max_val
-        output  = np.multiply(output, norm)
-        return output
 
-    def convolve(self):
-        return self._convolve()
-
-class ConvolverMgr(Audiofile):
-    def __init__(self, input_filename, impulse_filename, output_filename, plot_debug=False):
-        super().__init__(input_filename, impulse_filename, output_filename, plot_debug)
+class ConvolverMgr(AudiofileWave):
+    def __init__(self, input_filename, impulse_filename, output_filename, plot_debug=logging.WARN):
+        print("in: {}, impulse:{}, out:{}".format(input_filename, impulse_filename, output_filename))
+        super().__init__(plot_debug)
+        self.input_filename = input_filename
+        self.impulse_filename = impulse_filename
+        self.output_filename = output_filename
 
     def convolve(self):
         try:
@@ -69,23 +58,14 @@ class ConvolverMgr(Audiofile):
         signal = self._waveload(self.input_filename)
         impulse = self._waveload(self.impulse_filename)
         self.meta = self._metaload(self.input_filename)
-        self.convolver = Convolver(signal, impulse)
+        self.convolver = Convengine(signal, impulse)
     
     def _save(self):
         self._wavesave(self.output_filename, self.output, self.meta)
 
 
-
-class ConvolverArgumentParser(argparse.ArgumentParser):
-    def __init__(self):
-        super().__init__()
-        self.add_argument("--input", required=True)
-        self.add_argument("--impulse", required=True)
-        self.add_argument("--out", required=True)
-        self.parse_args()
-
 if __name__ == "__main__":
-    conv_parser = ConvolverArgumentParser()
+    conv_parser = Convarg()
     conv_args = conv_parser.parse_args()
     conv_mgr = ConvolverMgr(
         conv_args.input, conv_args.impulse, conv_args.out, plot_debug=PLOT_DEBUG
