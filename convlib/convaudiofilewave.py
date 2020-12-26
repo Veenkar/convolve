@@ -40,24 +40,13 @@ class ConvAudiofileWave(ConvAudiofileIf):
 
     def waveload(self, filename):
         samples, self.sample_rate = af.read(filename)
+        log.info(f"Loaded {len(samples)} samples from {self.sample_rate}-byte {filename}.")
         return samples
 
     def wavesave(self, filename, data, sample_rate):
-        log.debug(f"Saving {len(data)} samples to {filename}.")
-        self._debug_plt(DEBUG, data)
-
-        audio_as_np_int16 = data.astype(np.int16)
-        self._debug_plt(DEBUG, audio_as_np_int16)
-
-        audio_buffer_int16 = audio_as_np_int16.data
-
-        with wave.open(filename, mode='wb') as ofile:
-            ofile.setnchannels(1)
-            ofile.setsampwidth(2)
-            ofile.setframerate(sample_rate)
-            ofile.writeframes(audio_buffer_int16)
-
-        self._debug_plt(INFO, audio_buffer_int16)
+        log.info(f"Saving {len(data)} samples to {filename}.")
+        af.write(filename, data, sample_rate)
+        self._debug_plt(INFO, data)
 
     def _metaload(self, filename):
         if not self.sample_rate:
