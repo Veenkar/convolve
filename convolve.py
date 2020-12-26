@@ -35,11 +35,13 @@ log.addHandler(sh)
 
 
 class ConvolverMgr():
-    def __init__(self, input_filename, impulse_filename, output_filename, plot_debug=logging.WARN):
-        print("in: {}, impulse:{}, out:{}".format(input_filename, impulse_filename, output_filename))
+    def __init__(self, input_filename, impulse_filename, output_filename, recursive=False, plot_debug=logging.WARN):
+        print("in: {}, impulse:{}, out:{}, recursive:{}" \
+            .format(input_filename, impulse_filename, output_filename, recursive))
         self.input_filename = input_filename
         self.impulse_filename = impulse_filename
         self.output_filename = output_filename
+        self.recursive = recursive
 
         self.impulse_audiofile = ConvAudiofile(self.impulse_filename, plot_debug=plot_debug)
         self.signal_audiofile = ConvAudiofile(self.input_filename, plot_debug=plot_debug)
@@ -73,7 +75,8 @@ if __name__ == "__main__":
     conv_parser = Convarg()
     conv_args = conv_parser.parse_args()
     conv_mgr = ConvolverMgr(
-        conv_args.input, conv_args.impulse, conv_args.out, plot_debug=PLOT_DEBUG
+        conv_args.input, conv_args.impulse, conv_args.out,
+        recursive=conv_args.recursive, plot_debug=PLOT_DEBUG
     )
     conv_mgr.convolve()
 

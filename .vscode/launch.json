@@ -5,11 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Python: Convolve File",
             "type": "python",
             "request": "launch",
             "module": "convolve",
             "args": ["--input", "riff.wav", "--impulse", "cab.wav", "--out", "out.wav"]
+        },
+        {
+            "name": "Python: Convolve Dir",
+            "type": "python",
+            "request": "launch",
+            "module": "convolve",
+            "args": ["--recursive", "--input", "riff.wav", "--impulse", "cab.wav", "--out", "out.wav"]
         }
     ]
 }

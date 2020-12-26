@@ -6,5 +6,6 @@ class Convarg(ArgumentParser):
         self.add_argument("--input", required=True)
         self.add_argument("--impulse", required=True)
         self.add_argument("--out", required=True)
+        self.add_argument("--recursive", action='store_true')
         self.parse_args()
 
