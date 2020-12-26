@@ -7,7 +7,7 @@ from logging import DEBUG, INFO, WARN, FATAL
 # LOGGER
 log = getLogger()
 
-class ConvAudiofileWave(ConvAudiofileIf):
+class ConvAudiofile(ConvAudiofileIf):
     def __init__(self, plot_debug):
         super().__init__(plot_debug)
         self.sample_rate = None
@@ -17,13 +17,7 @@ class ConvAudiofileWave(ConvAudiofileIf):
         log.info(f"Loaded {len(samples)} samples from {self.sample_rate}-byte {filename}. Sample rate: {self.sample_rate}")
         return samples
 
-    def wavesave(self, filename, data, sample_rate):
-        log.info(f"Saving {len(data)} samples to {filename}. Sample rate: {sample_rate}")
+    def wavesave(self, filename, data):
+        log.info(f"Saving {len(data)} samples to {filename}. Sample rate: {self._sample_rate}")
         self._debug_plt(INFO, data)
-        af.write(filename, data, sample_rate)
-
-    def _metaload(self, filename):
-        if not self.sample_rate:
-            raise(Exception("Use waveload first!"))
-        return self.sample_rate
-
+        af.write(filename, data, self.sample_rate)
