@@ -1,4 +1,3 @@
-import wave
 import audiofile as af
 import numpy as np
 from convlib.convaudiofileif import ConvAudiofileIf
