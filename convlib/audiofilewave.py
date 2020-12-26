@@ -43,18 +43,18 @@ class AudiofileWave(Audiofile):
             params = ifile.getparams()
             sample_width = params.sampwidth
             log.info(f"Loaded {samples} samples from {sample_width}-byte {filename}.")
-
-
-        #byte_count = len(audio)
-        #sample_width = int(byte_count / samples) # TODO: ASSERT: reminder should be zero
-        
         
         # Convert buffer to float32 using NumPy
-        # audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
-        audio_arr = self._frombuffer(audio, sample_width, big_endian=False)
-
-        # audio_as_np_float = audio_as_np_int16.astype(np.float64)
-        audio_as_np_float = np.array(audio_arr)
+        if sample_width == 2:
+            audio_as_np_int16 = np.frombuffer(audio, dtype=np.int16)
+            audio_as_np_float = audio_as_np_int16.astype(np.float64)
+        elif sample_width == 4:
+            audio_as_np_int16 = np.frombuffer(audio, dtype=np.int32)
+            audio_as_np_float = audio_as_np_int16.astype(np.float64)
+        else:
+            log.warn("24-bit wave detected. Slower conversion due to lack of 24-bit int support in numpy.")
+            audio_arr = self._frombuffer(audio, sample_width, big_endian=False)
+            audio_as_np_float = np.array(audio_arr)
 
         # Normalise float32 array so that values are between -1.0 and +1.0                                                      
         # audio_normalised = audio_as_np_float32 / self.MAX_INT_16
