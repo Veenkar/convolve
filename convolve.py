@@ -56,8 +56,8 @@ class ConvolverMgr(ConvAudiofileWave):
 
     def _load(self):
         signal = self.waveload(self.input_filename)
-        impulse = self.waveload(self.impulse_filename)
         self.meta = self._metaload(self.input_filename)
+        impulse = self.waveload(self.impulse_filename)
         self.convolver = Convengine(signal, impulse)
     
     def _save(self):

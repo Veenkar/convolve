@@ -5,9 +5,7 @@ import numpy as np
 log = logging.getLogger()
 
 class Convengine:
-    MAX_INT_16 = (2**15)-1
-    MAX_OUTPUT_FACTOR = 0.99
-    MAX_OUT_VAL = int(MAX_OUTPUT_FACTOR * MAX_INT_16)
+    MAX_OUT_VAL = 0.99
     
     def __init__(self, signal, impulse_response):
         self.signal = signal
