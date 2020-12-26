@@ -7,8 +7,7 @@ log = logging.getLogger()
 class Convengine:
     MAX_OUT_VAL = 0.99
     
-    def __init__(self, signal, impulse):
-        self.signal = signal
+    def __init__(self, impulse):
         self.impulse = impulse
 
     def _convolve(self, signal, impulse):
@@ -22,15 +21,19 @@ class Convengine:
         wave_arr = [wave for x in range(num_channels)]
         return np.array(wave_arr)
 
-    def convolve(self):
-        sig_dim = len(self.signal.shape)
+    def convolve(self, signal):
+        sig_dim = len(signal.shape)
         imp_dim = len(self.impulse.shape)
+        impulse = self.impulse
 
         if sig_dim > imp_dim:
-            self.impulse = self._duplicate_wave_to_channels(self.impulse, 2)
+            impulse = self._duplicate_wave_to_channels(self.impulse, 2)
         elif sig_dim < imp_dim:
-            self.signal = self._duplicate_wave_to_channels(self.signal, 2)
+            signal = self._duplicate_wave_to_channels(signal, 2)
 
-        convolved_arr = [self._convolve(self.signal[x], self.impulse[x]) for x in range(2)]
+        if sig_dim > 1:
+            convolved_arr = [self._convolve(signal[x], impulse[x]) for x in range(2)]
+        else:
+            convolved_arr = self._convolve(signal, impulse)
 
         return np.array(convolved_arr)

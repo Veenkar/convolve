@@ -16,7 +16,7 @@
             "type": "python",
             "request": "launch",
             "module": "convolve",
-            "args": ["--recursive", "--input", "riff.wav", "--impulse", "cab.wav", "--out", "out.wav"]
+            "args": ["--recursive", "--input", "wavedir", "--impulse", "cab.wav", "--out", "outdir"]
         }
     ]
 }
