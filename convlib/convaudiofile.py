@@ -8,18 +8,19 @@ from logging import DEBUG, INFO, WARN, FATAL
 log = getLogger()
 
 class ConvAudiofile(ConvAudiofileIf):
-    def __init__(self, plot_debug):
+    def __init__(self, input_filename, plot_debug):
         super().__init__(plot_debug)
-        self.sample_rate = None
+        self._input_filename = input_filename
+        self._sample_rate = af.sampling_rate(input_filename)
+        self._depth = af.bit_depth(input_filename)
 
-    def waveload(self, filename):
-        wave, self.sample_rate = af.read(filename)
-        self.depth = af.bit_depth(filename)
+    def waveload(self):
+        wave, self.sample_rate = af.read(self._input_filename)
         log.info(f"Loaded {len(wave)} samples from " +
-            f"{self.depth}-byte {filename}. Sample rate: {self.sample_rate}")
+            f"{self._depth}-byte {self._input_filename}. Sample rate: {self._sample_rate}")
         return wave
 
     def wavesave(self, filename, wave):
         log.info(f"Saving {len(wave)} samples to {filename}. Sample rate: {self._sample_rate}")
         self._debug_plt(INFO, wave)
-        af.write(filename, wave, self.sample_rate)
+        af.write(filename, wave, self._sample_rate)

@@ -34,13 +34,18 @@ log.addHandler(sh)
 
 
 
-class ConvolverMgr(ConvAudiofile):
+class ConvolverMgr():
     def __init__(self, input_filename, impulse_filename, output_filename, plot_debug=logging.WARN):
         print("in: {}, impulse:{}, out:{}".format(input_filename, impulse_filename, output_filename))
-        super().__init__(plot_debug)
         self.input_filename = input_filename
         self.impulse_filename = impulse_filename
         self.output_filename = output_filename
+
+        self.impulse_audiofile = ConvAudiofile(self.impulse_filename, plot_debug=plot_debug)
+        self.signal_audiofile = ConvAudiofile(self.input_filename, plot_debug=plot_debug)
+
+        if self.impulse_audiofile.sample_rate != self.signal_audiofile.sample_rate:
+            raise Exception("Sample rates must match!")
 
     def convolve(self):
         try:
@@ -55,12 +60,13 @@ class ConvolverMgr(ConvAudiofile):
         print("convolution done")
 
     def _load(self):
-        impulse = self.waveload(self.impulse_filename)
-        signal = self.waveload(self.input_filename)
+        impulse = self.impulse_audiofile.waveload()
+        signal = self.signal_audiofile.waveload()
+
         self.convolver = Convengine(signal, impulse)
     
     def _save(self):
-        self.wavesave(self.output_filename, self.output)
+        self.impulse_audiofile.wavesave(self.output_filename, self.output)
 
 
 if __name__ == "__main__":
