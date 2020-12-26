@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from convlib.audiofilewave import AudiofileWave
+from convlib.convaudiofilewave import ConvAudiofileWave
 from convlib.convengine import Convengine
 from convlib.convarg import Convarg
 
@@ -34,7 +34,7 @@ log.addHandler(sh)
 
 
 
-class ConvolverMgr(AudiofileWave):
+class ConvolverMgr(ConvAudiofileWave):
     def __init__(self, input_filename, impulse_filename, output_filename, plot_debug=logging.WARN):
         print("in: {}, impulse:{}, out:{}".format(input_filename, impulse_filename, output_filename))
         super().__init__(plot_debug)
@@ -55,13 +55,13 @@ class ConvolverMgr(AudiofileWave):
         print("convolution done")
 
     def _load(self):
-        signal = self._waveload(self.input_filename)
-        impulse = self._waveload(self.impulse_filename)
+        signal = self.waveload(self.input_filename)
+        impulse = self.waveload(self.impulse_filename)
         self.meta = self._metaload(self.input_filename)
         self.convolver = Convengine(signal, impulse)
     
     def _save(self):
-        self._wavesave(self.output_filename, self.output, self.meta)
+        self.wavesave(self.output_filename, self.output, self.meta)
 
 
 if __name__ == "__main__":
