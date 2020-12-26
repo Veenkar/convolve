@@ -28,7 +28,7 @@ PLOT_DEBUG = logging.INFO
 
 # LOGGER
 log = logging.getLogger()
-log.setLevel(logging.WARN)
+log.setLevel(logging.INFO)
 sh = logging.StreamHandler(sys.stdout)
 log.addHandler(sh)
 
