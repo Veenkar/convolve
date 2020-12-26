@@ -16,11 +16,11 @@ class ConvAudiofile(ConvAudiofileIf):
 
     def waveload(self):
         wave, self.sample_rate = af.read(self._input_filename)
-        log.info(f"Loaded {len(wave)} samples from " +
+        log.info(f"Loaded {wave.shape} samples from " +
             f"{self._depth}-byte {self._input_filename}. Sample rate: {self._sample_rate}")
         return wave
 
     def wavesave(self, filename, wave):
-        log.info(f"Saving {len(wave)} samples to {filename}. Sample rate: {self._sample_rate}")
-        self._debug_plt(INFO, wave)
+        log.info(f"Saving {wave.shape} samples to {filename}. Sample rate: {self._sample_rate}")
+        self.debug_plt(INFO, wave)
         af.write(filename, wave, self._sample_rate)

@@ -38,3 +38,12 @@ class ConvAudiofileIf(ABC):
         plt.plot(time, plt_data)
         plt.show()
 
+    def debug_plt(self, level, plt_data):
+        if len(plt_data.shape) <= 1:
+            self._debug_plt(level, plt_data)
+        else:
+            for chan_data in plt_data:
+                self._debug_plt(level, chan_data)
+
+
+
