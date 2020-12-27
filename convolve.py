@@ -26,7 +26,7 @@ import sys
 
 
 # CONFIG
-PLOT_DEBUG = logging.INFO
+PLOT_DEBUG = logging.ERROR
 
 # LOGGER
 log = logging.getLogger()
@@ -51,6 +51,7 @@ class ConvolverMgr():
         self.impulse_filename = impulse_filename
         self.output_filename = output_filename
         self.recursive = recursive
+        self.tasks = []
 
         self.impulse_audiofile = ConvAudiofile(self.impulse_filename, plot_debug=plot_debug)
 
@@ -98,14 +99,15 @@ class ConvolverMgr():
         else:
             self._run_convolve_job(self.signal_audiofiles[0], self.output_filename)
 
+        for task in self.tasks:
+            await task
         #for signal_audiofile in self.signal_audiofiles:
         #    self._run_convolve_job(signal_audiofile, output_filename)
 
     def _run_convolve_job(self, wave, output_filename):
-        try:
-            self.tasks = asyncio.run(self._convolve_job(wave, output_filename))
-        except KeyboardInterrupt as e:
-            print("Caught keyboard interrupt. Canceling tasks...")  
+        self.tasks += asyncio.run(self._convolve_job(wave, output_filename))
+        # except KeyboardInterrupt as e:
+        #     print("Caught keyboard interrupt. Canceling tasks...")  
 
     async def _convolve_job(self, audiofile, output_filename):
         wave = audiofile.waveload()
