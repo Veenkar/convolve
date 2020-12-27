@@ -26,7 +26,7 @@ import sys
 
 
 # CONFIG
-PLOT_DEBUG = logging.INFO
+PLOT_DEBUG = logging.ERROR
 
 # LOGGER
 log = logging.getLogger()
@@ -99,9 +99,11 @@ class ConvolverMgr():
         impulse_data = self._load_impulse()
         self.convolver = Convengine(impulse_data)
 
-        if len(self.signal_audiofiles) > 1:
+        if self.recursive:
             for sig in self.signal_audiofiles:
-                output_branch_tuple = Path(sig.input_filename).parts[1:]
+                output_branch_tuple = Path(sig.input_filename).parts
+                if len(output_branch_tuple) > 1:
+                    output_branch_tuple = output_branch_tuple[1:]
                 output_path = Path(self.output_filename) / Path(*output_branch_tuple)
 
                 output_filename = str(output_path)
