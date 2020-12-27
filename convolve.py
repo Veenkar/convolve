@@ -44,6 +44,13 @@ class ConvolverMgr():
             msg += f" or {dirname} is not a directory!"
             super().__init__(msg)
 
+    class NotAudiofileException(Exception):
+        def __init__(self, filename):
+            msg = ""
+            msg += f"{filename} is not and audio file"
+            msg += f" or {filename} does not exist!"
+            super().__init__(msg)
+
     def __init__(self, signal_filename, impulse_filename, output_filename, recursive=False, plot_debug=logging.WARN):
         print("in: {}, impulse:{}, out:{}, recursive:{}" \
             .format(signal_filename, impulse_filename, output_filename, recursive))
@@ -58,15 +65,19 @@ class ConvolverMgr():
         for signal_filename in self.signal_filenames:
             try:
                 signal_audiofile = ConvAudiofile(signal_filename, plot_debug=plot_debug)
-                self.signal_audiofiles.append(signal_audiofile)
 
                 impulse_fs = self.impulse_audiofile.sample_rate
                 sig_fs = signal_audiofile.sample_rate
+
                 if impulse_fs != sig_fs:
                     msg = f"Sample rates must match! Impulse: {impulse_fs}, Sig: {sig_fs}"
                     log.error(msg)
+                    if not recursive:
+                        raise Exception(msg)
                     # TODO: interpolation
-                    # raise Exception(msg)
+                else:
+                    self.signal_audiofiles.append(signal_audiofile)
+
             except FileNotFoundError as e:
                 print(e)
 
@@ -95,6 +106,8 @@ class ConvolverMgr():
 
                 output_filename = str(output_path)
                 self._run_convolve_job(sig, output_filename)
+        elif len(self.signal_audiofiles) == 0:
+            raise(self.NotAudiofileException(f"{self.signal_filenames[0]}"))
         else:
             self._run_convolve_job(self.signal_audiofiles[0], self.output_filename)
 
