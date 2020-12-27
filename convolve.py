@@ -56,11 +56,19 @@ class ConvolverMgr():
 
         self.signal_audiofiles = []
         for signal_filename in self.signal_filenames:
-            signal_audiofile = ConvAudiofile(signal_filename, plot_debug=plot_debug)
-            self.signal_audiofiles.append(signal_audiofile)
+            try:
+                signal_audiofile = ConvAudiofile(signal_filename, plot_debug=plot_debug)
+                self.signal_audiofiles.append(signal_audiofile)
 
-            if self.impulse_audiofile.sample_rate != signal_audiofile.sample_rate:
-                raise Exception("Sample rates must match!")
+                impulse_fs = self.impulse_audiofile.sample_rate
+                sig_fs = signal_audiofile.sample_rate
+                if impulse_fs != sig_fs:
+                    msg = f"Sample rates must match! Impulse: {impulse_fs}, Sig: {sig_fs}"
+                    log.error(msg)
+                    # TODO: interpolation
+                    # raise Exception(msg)
+            except FileNotFoundError as e:
+                print(e)
 
         pass
 

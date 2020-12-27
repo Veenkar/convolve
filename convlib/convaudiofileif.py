@@ -10,7 +10,7 @@ log = getLogger()
 
 class ConvAudiofileIf(ABC):
     def __init__(self, input_filename, plot_debug):
-        print(f"plot debug: {plot_debug}")
+        log.info(f"plot debug: {plot_debug}")
         self._input_filename = input_filename
         self.plot_debug = plot_debug
         self._sample_rate = None
